@@ -5,24 +5,25 @@
 #include<algorithm>
 #include<iomanip> // Include iomanip for std::setw
 using std::cout;
+
 using Cell = std::variant<int, float, std::string>;
 using Row = std::vector<Cell>;
 using DataFrame = std::vector<Row>;
+
+int fieldcount=0;
+int rowscount=0;
 
 enum FieldType {
     INTEGER,
     STRING,
     FLOAT
 };
-
-int fieldcount=0;
-int rowscount=0;
-
 struct fieldstruct{
     FieldType key;
     std::string value;
     bool missingdata=false;
 };
+std::vector<fieldstruct> TrueFields;
 
 FieldType Ftypeidentifier(const std::string &value) {
     if (value.empty()) {
@@ -38,7 +39,7 @@ FieldType Ftypeidentifier(const std::string &value) {
     return STRING;
 }
 
-std::vector<fieldstruct> fieldsidentifier(std::ifstream &file){
+std::vector<fieldstruct> fieldsidentifier(std::ifstream &file,char delimiter=','){
     std::vector<fieldstruct> fields;
     std::string line;
     int pos=0,prevpos=0;
@@ -50,9 +51,9 @@ std::vector<fieldstruct> fieldsidentifier(std::ifstream &file){
     else{
         std::getline(file, line);
         std::getline(file, line);
-        line+=',';
+        line+=delimiter;
         for(char ch: line){
-            if(ch==','){
+            if(ch==delimiter){
                 value.clear();
                 fieldcount++;
                 for(int i=prevpos; i<pos; i++){
@@ -69,12 +70,12 @@ std::vector<fieldstruct> fieldsidentifier(std::ifstream &file){
         file.clear();
         file.seekg(0, std::ios::beg);
         std::getline(file, line);
-        line+=',';
+        line+=delimiter;//
         pos=0;
         prevpos=0;
         int j=0;
         for(char ch: line) {
-            if (ch == ',') {
+            if (ch == delimiter) {//
                 value.clear();
                 for (int i = prevpos; i < pos; i++) {
                     value += line[i];
@@ -85,6 +86,10 @@ std::vector<fieldstruct> fieldsidentifier(std::ifstream &file){
             }
             pos++;
         }
+    }
+    if(fields.size() == 1){
+        cout<<"\n\033[0;33mWarning\033[0m : Only one field is identified.\n";
+        cout<<"Check the delimiter used in the file and modify your command line according to it\n";
     }
     return fields;
 }
@@ -100,9 +105,7 @@ void datacounter(std::ifstream &file){
     rowscount--;
 }
 
-std::vector<fieldstruct> TrueFields;
-
-DataFrame createDataFrame(std::ifstream &file) {
+DataFrame createDataFrame(std::ifstream &file, char delimiter=',') {
     DataFrame df;
     Row row;
     Cell cell;
@@ -113,9 +116,9 @@ DataFrame createDataFrame(std::ifstream &file) {
     while(std::getline(file,line)){
         int pos=0,prevpos=0;
         int column = 0;
-        line += ',';
+        line += delimiter;
         for(char ch : line){
-            if(ch==','){
+            if(ch==delimiter){
                 value.clear();
                 for(int i=prevpos; i<pos; i++){
                     value += line[i];
@@ -163,9 +166,42 @@ DataFrame createDataFrame(std::ifstream &file) {
     return df;
 }
 
+void save_df(const DataFrame& df, const std::string& filename) {
+    std::ofstream file(filename);
+    if (!file.is_open()) {
+        cout << "Error opening file for writing.\n";
+        return;
+    }
+    
+    // Write header
+    for (int i = 0; i < fieldcount; ++i) {
+        file << TrueFields[i].value;
+        if (i < fieldcount - 1) {
+            file << ",";
+        }
+    }
+    file << "\n";
+    
+    // Write data rows
+    for (const auto& row : df) {
+        for (int i = 0; i < fieldcount; ++i) {
+            if (std::holds_alternative<int>(row[i])) {
+                file << std::get<int>(row[i]);
+            } else if (std::holds_alternative<float>(row[i])) {
+                file << std::get<float>(row[i]);
+            } else {
+                file << std::get<std::string>(row[i]);
+            }
+            if (i < fieldcount - 1) {
+                file << ",";
+            }
+        }
+        file << "\n";
+    }
+    
+    file.close();
+}
 
-
-//Sorting algorithm for the data
 void sort_df(DataFrame& df, int column_index, bool ascending = true) {
     if (column_index < 0 || column_index >= fieldcount) {
         cout << "Invalid column index.\n";
@@ -267,15 +303,16 @@ void terminal_df_print(const DataFrame& df) {
 }
 
 int main(){
-    std::ifstream file("data2.csv");
-    TrueFields = fieldsidentifier(file);
+    std::ifstream file("data.csv");
+    TrueFields = fieldsidentifier(file,',');
     datacounter(file);
     file.clear();
     file.seekg(0, std::ios::beg);
-    DataFrame df = createDataFrame(file);    
+    DataFrame df = createDataFrame(file,',');    
     cout << "\nDataFrame with field types:\n";
     //sort_df(df, 2, true); 
     terminal_df_print(df);
+    save_df(df, "output.csv");
     //printing TrueField information
     // cout << "\nField Information:\n";
     // for(int i=0; i<fieldcount; i++){

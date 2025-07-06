@@ -1,6 +1,5 @@
-Name,Age,Email,Score
-Alice,25,alice@example.com,85
-Bob,,bob@example.com,90
-Charlie,30,,78
-Diana,27,diana@example.com,
-Eve,,,95
+Name|Age|City
+Alice|30|New York
+Bob|25|Los Angeles
+Charlie|35|Chicago
+Diana|28|Houston
