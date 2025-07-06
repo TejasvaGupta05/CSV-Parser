@@ -139,6 +139,30 @@ DataFrame createDataFrame(std::ifstream &file) {
     return df;
 }
 
+//Sorting algorithm for the data
+void sort_df(DataFrame& df, int column_index, bool ascending = true) {
+    if (column_index < 0 || column_index >= fieldcount) {
+        cout << "Invalid column index.\n";
+        return;
+    }
+    
+    std::sort(df.begin(), df.end(), [column_index, ascending](const Row& a, const Row& b) {
+        const Cell& cell_a = a[column_index];
+        const Cell& cell_b = b[column_index];
+        
+        if (std::holds_alternative<int>(cell_a) && std::holds_alternative<int>(cell_b)) {
+            return ascending ? std::get<int>(cell_a) < std::get<int>(cell_b)
+                             : std::get<int>(cell_a) > std::get<int>(cell_b);
+        } else if (std::holds_alternative<float>(cell_a) && std::holds_alternative<float>(cell_b)) {
+            return ascending ? std::get<float>(cell_a) < std::get<float>(cell_b)
+                             : std::get<float>(cell_a) > std::get<float>(cell_b);
+        } else {
+            return ascending ? std::get<std::string>(cell_a) < std::get<std::string>(cell_b)
+                             : std::get<std::string>(cell_a) > std::get<std::string>(cell_b);
+        }
+    });
+}
+
 void terminal_df_print(const DataFrame& df) {
     std::string value;
     FieldType key;
@@ -224,6 +248,6 @@ int main(){
     file.seekg(0, std::ios::beg);
     DataFrame df = createDataFrame(file);    
     cout << "\nDataFrame with field types:\n";
+    //sort_df(df, 2, true); 
     terminal_df_print(df);
-    
 }
