@@ -225,4 +225,5 @@ int main(){
     DataFrame df = createDataFrame(file);    
     cout << "\nDataFrame with field types:\n";
     terminal_df_print(df);
+    
 }
