@@ -21,6 +21,7 @@ int rowscount=0;
 struct fieldstruct{
     FieldType key;
     std::string value;
+    bool missingdata=false;
 };
 
 FieldType Ftypeidentifier(const std::string &value) {
@@ -120,11 +121,34 @@ DataFrame createDataFrame(std::ifstream &file) {
                     value += line[i];
                 }
                 if (TrueFields[column].key == INTEGER) {
-                    cell = std::stoi(value);
+                    if(value.empty()) {
+                        TrueFields[column].missingdata = true; 
+                        cell = 0; // Default to 0 for empty integer values
+                    } else {
+                        try {
+                            cell = std::stoi(value);
+                        } catch (const std::invalid_argument&) {
+                            cell = 0; // Handle invalid conversion gracefully
+                        }
+                    }
                 } else if (TrueFields[column].key == FLOAT) {
-                    cell = std::stof(value);
+                    if(value.empty()) {
+                        TrueFields[column].missingdata = true;
+                        cell = 0.0f; // Default to 0.0 for empty float values
+                    } else {
+                        try {
+                            cell = std::stof(value);
+                        } catch (const std::invalid_argument&) {
+                            cell = 0.0f; // Handle invalid conversion gracefully
+                        }
+                    }
                 } else {
-                    cell = value;
+                    if(value.empty()) {
+                        TrueFields[column].missingdata = true;
+                        cell = "NA"; // Default to empty string for empty string values
+                    } else {
+                        cell = value; // Store the string value directly
+                    }
                 }
                 row.push_back(cell);
                 column++;
@@ -138,6 +162,8 @@ DataFrame createDataFrame(std::ifstream &file) {
     }
     return df;
 }
+
+
 
 //Sorting algorithm for the data
 void sort_df(DataFrame& df, int column_index, bool ascending = true) {
@@ -241,7 +267,7 @@ void terminal_df_print(const DataFrame& df) {
 }
 
 int main(){
-    std::ifstream file("data.csv");
+    std::ifstream file("data2.csv");
     TrueFields = fieldsidentifier(file);
     datacounter(file);
     file.clear();
@@ -250,4 +276,12 @@ int main(){
     cout << "\nDataFrame with field types:\n";
     //sort_df(df, 2, true); 
     terminal_df_print(df);
+    //printing TrueField information
+    // cout << "\nField Information:\n";
+    // for(int i=0; i<fieldcount; i++){
+    //     cout << "Field " << i+1 << ": " << TrueFields[i].value 
+    //          << " (Type: " << (TrueFields[i].key == INTEGER ? "INTEGER" : 
+    //                          TrueFields[i].key == FLOAT ? "FLOAT" : "STRING") 
+    //          << ", Missing Data: " << (TrueFields[i].missingdata ? "Yes" : "No") << ")\n";
+    // }
 }
