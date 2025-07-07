@@ -12,6 +12,7 @@ using DataFrame = std::vector<Row>;
 
 int fieldcount=0;
 int rowscount=0;
+char delimiters[]={',',';','|','\t'};
 
 enum FieldType {
     INTEGER,
@@ -27,6 +28,7 @@ std::vector<fieldstruct> TrueFields;
 
 FieldType Ftypeidentifier(const std::string &value) {
     if (value.empty()) {
+        cout<<"\033[33mWarning\033[0m : Might have missing value in 1st data row of csv, This will cause to read that field datatype as string.\n";
         return STRING; // Default to STRING for empty values
     }
     if (std::all_of(value.begin(), value.end(), ::isdigit)) {
@@ -37,6 +39,16 @@ FieldType Ftypeidentifier(const std::string &value) {
         return FLOAT;
     }
     return STRING;
+}
+
+char delimiteridentifier(const std::string &line) {
+    for (char delimiter : delimiters) {
+        if (line.find(delimiter) != std::string::npos) {
+            return delimiter;
+        }
+    }
+    cout << "\033[31mError\033[0m : No valid delimiter found in the file.\n";
+    return ',';
 }
 
 std::vector<fieldstruct> fieldsidentifier(std::ifstream &file,char delimiter=','){
@@ -303,12 +315,18 @@ void terminal_df_print(const DataFrame& df) {
 }
 
 int main(){
-    std::ifstream file("data.csv");
-    TrueFields = fieldsidentifier(file,',');
+    char delimiter = ',';
+    std::ifstream file("data2.csv");
+    if (!file.is_open()) return 1;
+    else{std::string line; std::getline(file, line); 
+        delimiter = delimiteridentifier(line); 
+        file.clear(); file.seekg(0, std::ios::beg);
+    }    
+    TrueFields = fieldsidentifier(file,delimiter);
     datacounter(file);
     file.clear();
     file.seekg(0, std::ios::beg);
-    DataFrame df = createDataFrame(file,',');    
+    DataFrame df = createDataFrame(file,delimiter);    
     cout << "\nDataFrame with field types:\n";
     //sort_df(df, 2, true); 
     terminal_df_print(df);
