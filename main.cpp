@@ -28,16 +28,22 @@ std::vector<fieldstruct> TrueFields;
 
 FieldType Ftypeidentifier(const std::string &value) {
     if (value.empty()) {
-        cout<<"\033[33mWarning\033[0m : Might have missing value in 1st data row of csv, This will cause to read that field datatype as string.\n";
-        return STRING; // Default to STRING for empty values
+        cout << "\033[33mWarning\033[0m : Might have missing value in 1st data row of CSV. This will cause that field's datatype to be inferred as STRING.\n";
+        return STRING;
     }
-    if (std::all_of(value.begin(), value.end(), ::isdigit)) {
-        return INTEGER;
-    }
-    if (value.find('.') != std::string::npos && 
-        std::all_of(value.begin(), value.end(), [](char c) { return ::isdigit(c) || c == '.'; })) {
-        return FLOAT;
-    }
+
+    try {
+        size_t idx;
+        int i = std::stoi(value, &idx);
+        if (idx == value.length()) return INTEGER; // Entire string parsed
+    } catch (...) {}
+
+    try {
+        size_t idx;
+        float f = std::stof(value, &idx);
+        if (idx == value.length()) return FLOAT; // Entire string parsed
+    } catch (...) {}
+
     return STRING;
 }
 
@@ -218,6 +224,20 @@ void save_df(const DataFrame& df, const std::string& filename) {
     file.close();
 }
 
+template<typename T>
+void get_column(std::vector<T>& x,const DataFrame& df, const int index){
+    if (index < 0 || index >= fieldcount) {
+        cout << "Invalid column index.\n";
+    }
+    for (int i = 0; i < rowscount; ++i) {
+        if (std::holds_alternative<T>(df[i][index])) {
+            x.push_back(std::get<T>(df[i][index]));
+        } else {
+            cout << "Type mismatch in column " << index << ".\n";
+        }
+    }
+}
+
 void sort_df(DataFrame& df, int column_index, bool ascending = true) {
     if (column_index < 0 || column_index >= fieldcount) {
         cout << "Invalid column index.\n";
@@ -333,15 +353,21 @@ int main(){
     file.seekg(0, std::ios::beg);
     createDataFrame(file,df,delimiter);    
     cout << "\nDataFrame with field types:\n";
-    cout << "\nField Information:\n";
     //sort_df(df, 2, true); 
     terminal_df_print(df);
     save_df(df, "output.csv");
     //printing TrueField information
+    cout << "\nField Information:\n";
     for(int i=0; i<fieldcount; i++){
         cout << "Field " << i+1 << ": " << TrueFields[i].value 
              << " (Type: " << (TrueFields[i].key == INTEGER ? "INTEGER" : 
                              TrueFields[i].key == FLOAT ? "FLOAT" : "STRING") 
              << ", Missing Data: " << (TrueFields[i].missingdata ? "Yes" : "No") << ")\n";
     }
+    std::vector<int> age;
+    get_column(age, df, 2); // Assuming the age column is at index 2
+    cout << "\nAge column data:\n";
+    for (const auto& a : age) {
+        cout << a << " ";
+    }    
 }
