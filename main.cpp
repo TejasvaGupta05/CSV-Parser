@@ -224,6 +224,37 @@ void save_df(const DataFrame& df, const std::string& filename) {
     file.close();
 }
 
+void change_value(DataFrame& df,std::string field_name,int row_index, const Cell& new_value) {
+    if (row_index < 0 || row_index >= rowscount) {
+        cout << "Invalid row index.\n";
+        return;
+    }
+    
+    auto it = std::find_if(TrueFields.begin(), TrueFields.end(),
+                           [&field_name](const fieldstruct& field) { return field.value == field_name; });
+    
+    if (it == TrueFields.end()) {
+        cout << "Field not found.\n";
+        return;
+    }
+    
+    int column_index = std::distance(TrueFields.begin(), it);
+    
+    if (column_index < 0 || column_index >= fieldcount) {
+        cout << "Invalid column index.\n";
+        return;
+    }
+    
+    df[row_index][column_index] = new_value;
+}
+
+void reset_df(DataFrame& df) {
+    df.clear();
+    rowscount = 0;
+    fieldcount = 0;
+    TrueFields.clear();
+}
+
 template<typename T>
 void get_column(std::vector<T>& x,const DataFrame& df, const int index){
     if (index < 0 || index >= fieldcount) {
@@ -338,6 +369,19 @@ void terminal_df_print(const DataFrame& df) {
     cout << "\n";
 }
 
+void print_info(DataFrame& df) {
+    cout << "DataFrame Information:\n";
+    cout << "Number of Fields: " << fieldcount << "\n";
+    cout << "Number of Rows: " << rowscount << "\n";
+    cout << "\nField Information:\n";
+    for(int i=0; i<fieldcount; i++){
+        cout << "Field " << i+1 << ": " << TrueFields[i].value 
+             << " (Type: " << (TrueFields[i].key == INTEGER ? "INTEGER" : 
+                             TrueFields[i].key == FLOAT ? "FLOAT" : "STRING") 
+             << ", Missing Data: " << (TrueFields[i].missingdata ? "Yes" : "No") << ")\n";
+    }
+}
+
 int main(){
     char delimiter = ',';
     DataFrame df;
@@ -355,15 +399,13 @@ int main(){
     cout << "\nDataFrame with field types:\n";
     //sort_df(df, 2, true); 
     terminal_df_print(df);
+    change_value(df, "Age", 0, 30); // Change Alice's age to 30
+    terminal_df_print(df);
+    reset_df(df); // Reset the DataFrame
+    terminal_df_print(df);
     save_df(df, "output.csv");
     //printing TrueField information
-    cout << "\nField Information:\n";
-    for(int i=0; i<fieldcount; i++){
-        cout << "Field " << i+1 << ": " << TrueFields[i].value 
-             << " (Type: " << (TrueFields[i].key == INTEGER ? "INTEGER" : 
-                             TrueFields[i].key == FLOAT ? "FLOAT" : "STRING") 
-             << ", Missing Data: " << (TrueFields[i].missingdata ? "Yes" : "No") << ")\n";
-    }
+    print_info(df);
     std::vector<int> age;
     get_column(age, df, 2); // Assuming the age column is at index 2
     cout << "\nAge column data:\n";
