@@ -54,6 +54,7 @@ char delimiteridentifier(const std::string &line) {
 std::vector<fieldstruct> fieldsidentifier(std::ifstream &file,char delimiter=','){
     std::vector<fieldstruct> fields;
     std::string line;
+    bool inside_quotes = false;
     int pos=0,prevpos=0;
     fieldstruct field;
     std::string value;
@@ -65,7 +66,8 @@ std::vector<fieldstruct> fieldsidentifier(std::ifstream &file,char delimiter=','
         std::getline(file, line);
         line+=delimiter;
         for(char ch: line){
-            if(ch==delimiter){
+            if(ch=='"')inside_quotes=!inside_quotes;
+            if(ch==delimiter && !inside_quotes){
                 value.clear();
                 fieldcount++;
                 for(int i=prevpos; i<pos; i++){
@@ -82,12 +84,13 @@ std::vector<fieldstruct> fieldsidentifier(std::ifstream &file,char delimiter=','
         file.clear();
         file.seekg(0, std::ios::beg);
         std::getline(file, line);
-        line+=delimiter;//
+        line+=delimiter;
         pos=0;
         prevpos=0;
         int j=0;
         for(char ch: line) {
-            if (ch == delimiter) {//
+            if(ch=='"') inside_quotes=!inside_quotes;
+            if (ch == delimiter && !inside_quotes) {
                 value.clear();
                 for (int i = prevpos; i < pos; i++) {
                     value += line[i];
@@ -117,12 +120,12 @@ void datacounter(std::ifstream &file){
     rowscount--;
 }
 
-DataFrame createDataFrame(std::ifstream &file, char delimiter=',') {
-    DataFrame df;
+void createDataFrame(std::ifstream &file,DataFrame &df, char delimiter=',') {
     Row row;
     Cell cell;
     std::string line;
     std::string value;
+    bool inside_quotes = false;
     std::getline(file, line); // Skip the header line
     line.clear(); // Clear the line to prepare for reading data
     while(std::getline(file,line)){
@@ -130,7 +133,8 @@ DataFrame createDataFrame(std::ifstream &file, char delimiter=',') {
         int column = 0;
         line += delimiter;
         for(char ch : line){
-            if(ch==delimiter){
+            if(ch=='"') inside_quotes = !inside_quotes; 
+            if(ch==delimiter && !inside_quotes){
                 value.clear();
                 for(int i=prevpos; i<pos; i++){
                     value += line[i];
@@ -175,7 +179,7 @@ DataFrame createDataFrame(std::ifstream &file, char delimiter=',') {
         row.clear();
         line.clear();
     }
-    return df;
+
 }
 
 void save_df(const DataFrame& df, const std::string& filename) {
@@ -316,7 +320,8 @@ void terminal_df_print(const DataFrame& df) {
 
 int main(){
     char delimiter = ',';
-    std::ifstream file("data2.csv");
+    DataFrame df;
+    std::ifstream file("data.csv");
     if (!file.is_open()) return 1;
     else{std::string line; std::getline(file, line); 
         delimiter = delimiteridentifier(line); 
@@ -326,17 +331,17 @@ int main(){
     datacounter(file);
     file.clear();
     file.seekg(0, std::ios::beg);
-    DataFrame df = createDataFrame(file,delimiter);    
+    createDataFrame(file,df,delimiter);    
     cout << "\nDataFrame with field types:\n";
+    cout << "\nField Information:\n";
     //sort_df(df, 2, true); 
     terminal_df_print(df);
     save_df(df, "output.csv");
     //printing TrueField information
-    // cout << "\nField Information:\n";
-    // for(int i=0; i<fieldcount; i++){
-    //     cout << "Field " << i+1 << ": " << TrueFields[i].value 
-    //          << " (Type: " << (TrueFields[i].key == INTEGER ? "INTEGER" : 
-    //                          TrueFields[i].key == FLOAT ? "FLOAT" : "STRING") 
-    //          << ", Missing Data: " << (TrueFields[i].missingdata ? "Yes" : "No") << ")\n";
-    // }
+    for(int i=0; i<fieldcount; i++){
+        cout << "Field " << i+1 << ": " << TrueFields[i].value 
+             << " (Type: " << (TrueFields[i].key == INTEGER ? "INTEGER" : 
+                             TrueFields[i].key == FLOAT ? "FLOAT" : "STRING") 
+             << ", Missing Data: " << (TrueFields[i].missingdata ? "Yes" : "No") << ")\n";
+    }
 }
