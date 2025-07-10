@@ -27,6 +27,13 @@ FieldType Ftypeidentifier(const std::string &value);
 char delimiteridentifier(const std::string &line);
 
 class DataFrame {
+private:
+    std::vector<fieldstruct> fieldsidentifier(std::ifstream &file, char delimiter=',');
+
+    void datacounter(std::ifstream &file);
+
+    void createDataFrame(std::ifstream &file, char delimiter=',');
+
 public:
     std::vector<Row> data;
     std::vector<fieldstruct> TrueFields;
@@ -37,11 +44,6 @@ public:
 
     void reset();
 
-    std::vector<fieldstruct> fieldsidentifier(std::ifstream &file, char delimiter=',');
-    
-    void datacounter(std::ifstream &file);
-
-    void createDataFrame(std::ifstream &file, char delimiter=',');
 
     void read_csv(const std::string& filename, char delimiter = ',');
     
