@@ -123,3 +123,35 @@ Field 4: Country (Type: STRING, Missing Data: No)
 Field 5: Score (Type: FLOAT, Missing Data: No)
 ```
 
+### Sorting 
+To sort the `DataFrame` df in 
+- **Ascending**
+```cpp
+df.sort(2,true);     //this will sort the data according to the column of index 2 in ascending order
+```
+this will sort the data according to the column of **index 2** in ascending order
+- **Descending**
+```cpp
+df.sort(2,false);     //this will sort the data according to the column of index 2 in descending order
+```
+If we _sort_ our dataset in ascending order in context of **index 2 i.e. Age**, and then print it using `df.print();` 
+```bash
++----+---------+-----+-----------+-----------+
+| ID | Name    | Age | Country   | Score     |
++----+---------+-----+-----------+-----------+
+| 4  | Diana   | 23  | Australia | 68.900002 |
+| 9  | Ivy     | 26  | China     | 85.099998 |
+| 6  | Fatima  | 27  | UAE       | 88.400002 |
+| 1  | Alice   | 29  | France    | 83.5      |
+| 10 | Jack    | 30  | Brazil    | 90        |
+| 5  | Ethan   | 31  | India     | 74.300003 |
+| 8  | Hiro    | 34  | Japan     | 79.699997 |
+| 2  | Bob     | 35  | Canada    | 77        |
+| 7  | George  | 39  | Germany   | 81        |
+| 3  | Charlie | 42  | UK        | 91.199997 |
++----+---------+-----+-----------+-----------+
+```
+
+---
+## Author
+Made with ❤️ by [Tejasva Gupta](https://github.com/TejasvaGupta05/)
