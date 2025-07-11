@@ -1,3 +1,5 @@
 #Prevents Backup directories to be tracked
 #by git
 Backup/
+.vscode/
+src/
