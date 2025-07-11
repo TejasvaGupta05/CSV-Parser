@@ -1,31 +1,125 @@
-# Documentation
-A light weight CSV parser library for C++
+# 📄 Documentation  
+A lightweight and header-only **CSV parser library for C++**.
 
-### 🚀 Features
-- **Schema Inference :**
-Automatically determines the data type of each column (e.g., int, float, string).
 
-- **Auto-Detect Delimiter :**
-Detects common delimiters such as commas, semicolons, tabs, or pipes without manual configuration.
 
-- **Configurable or Detected Delimiters :**
-Supports both automatic detection and manual setting of delimiters.
+## 🚀 Features
 
-- **Missing Value Strategies :**
-Identifies and flags rows with missing or empty fields, helping in data cleaning and validation.
+- **Schema Inference :** Automatically determines the data type of each column (`int`, `float`, or `std::string`).
 
-> Flags can be printed through:<pre>`df.print_info(); //df is the object of DataFrame class`</pre>
+- **Auto-Detect Delimiter :** Detects common delimiters like `,`, `;`, `\t`, `|` without any manual input.
 
-- **Robust Quoted Field Handling :** 
-Properly parses fields enclosed in quotes, including those with embedded delimiters or newlines.
+- **Configurable or Auto Delimiter Detection :** Supports both automatic delimiter detection and manual setting via constructor.
 
-- **Escape Character Support :** 
-Handles escaped characters like \", \\, and \, to ensure accurate parsing.
+- **Missing Value Strategies :** Flags rows with missing or empty fields to help in data validation and cleaning.
 
-- **Header File Support :** 
-Can be included in your code with few steps
+- **Robust Quoted Field Handling :** Accurately parses fields enclosed in quotes — even if they contain newlines or delimiters inside them.
+
+- **Escape Character Support :** Handles escaped characters like `\\`, `\"`, `\,` for precise parsing.
+
+- **Header-Only Design :** Just include the `.hpp` file — no build step, no dependencies.
+
+---
 
 ## 📁 Installation
 
+### 🛠️ Requirements
+- A C++17 compatible compiler (e.g., **g++**, **clang++**)
+- No external libraries required
 
+
+
+### 🔧 Installation Steps
+
+#### 📌 Method 1: Project-local use
+
+1. Clone the repository or copy the `include/` folder into your project directory:
+   ```bash
+   git clone https://github.com/TejasvaGupta05/CSV-Parser.git
+   ```
+2. Include the header file in your *.cpp* file:
+   ```cpp
+   #include "include/csvparser.hpp"
+   ```
+#### 📌 Method 2: Global installation
+1. Copy the `csvparser.hpp` file into your global compiler include path
+    (e.g., `/usr/include/` or your `MinGW/VS include/` folder).
+
+2. Then you can simply write:
+   ```cpp
+   #include "csvparser.hpp"
+   ```
+---
+## Getting Started
+Use either form based on where the file is located:
+```cpp
+#include "csvparser.hpp"
+// or
+#include "include/csvparser.hpp"
+```
+### Initializing DataFrame:
+Since `csvparser.hpp` is a class based header, we need to initialize it with object creation of the class `DataFrame`.
+```cpp
+#include "csvparser.hpp" //or "include/csvparser.hpp"
+
+int main(){
+    DataFrame df;  // df is the object of the DataFrame class
+}
+```
+This is the basic structure of your program.
+
+### Reading CSV file
+Let's take `df` as our reference object.
+Make sure you have the `.csv` file in the same directory, or in the directory you will mention in `read_csv()` function.
+```cpp
+df.read_csv("data.csv");
+```
+```cpp
+df.read_csv("\path\to\data.csv");
+```
+This will fetch all the information from your `.csv` file and store it inside the **df DataFrame**.
+
+### Printing the DataFrame
+YES, it has a option to print the fetched `DataFrame` in form of `table`.
+```cpp
+df.print();   //will print the fetched contents of csv file in the terminal (as a table)
+```
+
+Output:
+```bash
++----+---------+-----+-----------+-----------+
+| ID | Name    | Age | Country   | Score     |
++----+---------+-----+-----------+-----------+
+| 1  | Alice   | 29  | France    | 83.5      |
+| 2  | Bob     | 35  | Canada    | 77        |
+| 3  | Charlie | 42  | UK        | 91.199997 |
+| 4  | Diana   | 23  | Australia | 68.900002 |
+| 5  | Ethan   | 31  | India     | 74.300003 |
+| 6  | Fatima  | 27  | UAE       | 88.400002 |
+| 7  | George  | 39  | Germany   | 81        |
+| 8  | Hiro    | 34  | Japan     | 79.699997 |
+| 9  | Ivy     | 26  | China     | 85.099998 |
+| 10 | Jack    | 30  | Brazil    | 90        |
++----+---------+-----+-----------+-----------+
+```
+
+### Getting information about different fields
+
+```cpp
+df.print_info();   //will print the information about different fields of the data
+```
+
+Output:
+```bash
+DataFrame Information:
+Number of Fields: 5
+Number of Rows: 10
+
+Field Information:
+Field 1: ID (Type: INTEGER, Missing Data: No)
+Field 2: Name (Type: STRING, Missing Data: No)
+Field 3: Age (Type: INTEGER, Missing Data: No)
+Field 4: Country (Type: STRING, Missing Data: No)
+Field 5: Score (Type: FLOAT, Missing Data: No)
+```
 
