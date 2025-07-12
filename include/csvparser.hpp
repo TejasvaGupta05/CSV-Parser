@@ -11,7 +11,7 @@ using std::cout;
 using Cell = std::variant<int, float, std::string>;
 using Row = std::vector<Cell>;
 
-extern char delimiters[] = {',', ';', '|', '\t'};
+char delimiters[] = {',', ';', '|', '\t'};
 enum FieldType
 {
     INTEGER,
