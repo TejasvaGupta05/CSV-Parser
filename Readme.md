@@ -23,13 +23,13 @@ A lightweight and header-only **CSV parser library for C++**.
 
 ## 📁 Installation
 
-### 🛠️ Requirements
+### Requirements
 - A C++17 compatible compiler (e.g., **g++**, **clang++**)
 - No external libraries required
 
 
 
-### 🔧 Installation Steps
+### Installation Steps
 
 #### 📌 Method 1: Project-local use
 
@@ -50,7 +50,7 @@ A lightweight and header-only **CSV parser library for C++**.
    #include "csvparser.hpp"
    ```
 ---
-## Getting Started
+## 🏗️ Getting Started
 Use either form based on where the file is located:
 ```cpp
 #include "csvparser.hpp"
@@ -79,7 +79,7 @@ df.read_csv("\path\to\data.csv");
 ```
 This will fetch all the information from your `.csv` file and store it inside the **df DataFrame**.
 
-### Printing the DataFrame
+### 🖨️ Printing the DataFrame
 YES, it has a option to print the fetched `DataFrame` in form of `table`.
 ```cpp
 df.print();   //will print the fetched contents of csv file in the terminal (as a table)
@@ -123,7 +123,7 @@ Field 4: Country (Type: STRING, Missing Data: No)
 Field 5: Score (Type: FLOAT, Missing Data: No)
 ```
 
-### Sorting 
+### 🔃 Sorting 
 To sort the `DataFrame` df in 
 - **Ascending**
 ```cpp
@@ -150,6 +150,38 @@ If we _sort_ our dataset in ascending order in context of **index 2 i.e. Age**, 
 | 7  | George  | 39  | Germany   | 81        |
 | 3  | Charlie | 42  | UK        | 91.199997 |
 +----+---------+-----+-----------+-----------+
+```
+### Changing a Specific Value
+Any value in the database can be changed using:
+```cpp
+df.change_value("Age",3,100);   //This will change the 3rd index value of *Age* Field to = 100 
+```
+This will change the 3rd index value of *Age* Field to = **100**
+```bash
+| 1  | Alice   | 100  | France    | 83.5      |      //Since in Sorted dataset 3rd index is this
+```
+
+### Store any field -> vector
+1. Create a vector of your desired field datatype
+   e.g. I want to Store `Score` in a `vector` i.e. a `float` datatype
+   ```cpp
+   std::vector<float> Scores;     //Create a float vector Scores to store score
+   ```
+2. Use `get_column()` function to fetch the column data into `Scores`
+   ```cpp
+   df.get_column(Scores,4);      //Stores 4th index column in Scores vector
+   ```
+
+### 💾 Saving the DataFrame
+To save the DataFrame df into your working directory use:
+```cpp
+df.save("output.csv");         //Saves the DataFrame as output.csv
+```
+
+### ♻️ Resetting
+To Reset the DataFrame `df`
+```cpp
+df.reset();                   //Empties the DataFrame and is ready to read another csv again
 ```
 
 ---
