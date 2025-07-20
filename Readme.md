@@ -151,6 +151,40 @@ If we _sort_ our dataset in ascending order in context of **index 2 i.e. Age**, 
 | 3  | Charlie | 42  | UK        | 91.199997 |
 +----+---------+-----+-----------+-----------+
 ```
+
+### 📑 Copying The DataFrame
+Specific contents of a DataFrame can be copied to other using `copy` function.
+For that you should have a new dataframe object :
+```cpp
+DataFrame new_df; //New DataFrame Object Declaration
+```
+1. Using index numbers
+   ```cpp
+   df.copy(new_df,std::vector<int>{1,4});    //Copying specific fields from df to new_df
+   new_df.print();    //Printing the new DataFrame
+   ```
+2. Using Field Names
+   ```cpp
+   df.copy(new_df,std::vector<std::string>{"Name","Score"});    //Copying specific fields from df to new_df
+   new_df.print();    //Printing the new DataFrame
+   ```
+**OUTPUT**
+```bash
++---------+-----------+
+| Name    | Score     |
++---------+-----------+
+| Alice   | 83.5      |
+| Bob     | 77        |
+| Charlie | 91.199997 |
+| Diana   | 68.900002 |
+| Ethan   | 74.300003 |
+| Fatima  | 88.400002 |
+| George  | 81        |
+| Hiro    | 79.699997 |
+| Ivy     | 85.099998 |
+| Jack    | 90        |
++---------+-----------+
+```
 ### Changing a Specific Value
 Any value in the database can be changed using:
 ```cpp
