@@ -1,4 +1,4 @@
-# 📄 Documentation  
+# Documentation  
 A lightweight and header-only **CSV parser library for C++**.
 
 
