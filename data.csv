@@ -1,6 +1,11 @@
 ID,Name,Age,Country,Score
 1,Alice,29,France,83.5
-2,Charlie,,UK,91.2
-3,Fatima,27,UAE,
-4,,34,Japan,79.7
-5,Jack,30,Brazil,90.0
+2,Bob,35,Canada,77
+3,Charlie,42,UK,91.2
+4,Diana,23,Australia,68.9
+5,Ethan,31,India,74.3
+6,Fatima,27,UAE,88.4
+7,George,39,Germany,81
+8,Hiro,34,Japan,79.7
+9,Ivy,26,China,85.1
+10,Jack,30,Brazil,90
