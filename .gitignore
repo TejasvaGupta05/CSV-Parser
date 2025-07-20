@@ -4,3 +4,4 @@ Backup/
 .vscode/
 src/
 *.exe
+main.cpp

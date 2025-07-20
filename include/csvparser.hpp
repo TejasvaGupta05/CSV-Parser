@@ -242,6 +242,7 @@ private:
             line.clear();
         }
     }
+  
 
 public:
     std::vector<Row> data;
@@ -324,6 +325,84 @@ public:
             file << "\n";
         }
         file.close();
+    }
+
+    void copy(DataFrame &new_df,const std::vector<std::string> &field_names){
+        std::vector<int> field_indices;
+        if (field_names.empty())
+        {
+            cout << "\033[31mError\033[0m : No fields specified for the new DataFrame.\n";
+            return;
+        }
+        bool flag;
+        for(const std::string &name : field_names){
+            flag = false;
+            for(int i = 0; i < TrueFields.size(); ++i){
+                if(TrueFields[i].value == name){
+                    field_indices.push_back(i);
+                    flag = true;
+                    break;
+                }
+            }
+            if(!flag){
+                cout << "\033[31mError\033[0m : Field '" << name << "' not found in the DataFrame.\n";
+                return;
+            }
+        }
+        new_df.fieldcount = field_indices.size();
+        new_df.TrueFields.resize(new_df.fieldcount);
+        for(int i = 0; i < new_df.fieldcount; ++i){
+            new_df.TrueFields[i] = TrueFields[field_indices[i]];
+        }
+        new_df.rowscount = rowscount;
+        new_df.data.resize(rowscount);
+        for(int i = 0; i < rowscount; ++i){
+            new_df.data[i].resize(new_df.fieldcount);
+            for(int j = 0; j < new_df.fieldcount; ++j){
+                new_df.data[i][j] = data[i][field_indices[j]];
+            }
+        }
+    }
+
+    void copy(DataFrame &new_df, const std::vector<int> &field_indices)
+    {
+        if (field_indices.empty())
+        {
+            cout << "\033[31mError\033[0m : No fields specified for the new DataFrame.\n";
+            return;
+        }
+        new_df.fieldcount = field_indices.size();
+        new_df.TrueFields.resize(new_df.fieldcount);
+        for (int i = 0; i < new_df.fieldcount; ++i)
+        {
+            if (field_indices[i] < 0 || field_indices[i] >= TrueFields.size())
+            {
+                cout << "\033[31mError\033[0m : Invalid field index " << field_indices[i] << ".\n";
+                return;
+            }
+            new_df.TrueFields[i] = TrueFields[field_indices[i]];
+        }
+        new_df.rowscount = rowscount;
+        new_df.data.resize(rowscount);
+        for (int i = 0; i < rowscount; ++i)
+        {
+            new_df.data[i].resize(new_df.fieldcount);
+            for (int j = 0; j < new_df.fieldcount; ++j)
+            {
+                new_df.data[i][j] = data[i][field_indices[j]];
+            }
+        }
+    }
+
+    void add_row(const Row &new_row)
+    {
+        if (new_row.size() != fieldcount)
+        {
+            cout << "\033[31mError\033[0m : Row size does not match the number of fields.\n";
+            return;
+        }
+        data.push_back(new_row);
+        rowscount++;
     }
 
     void change_value(std::string field_name, int row_index, const Cell &new_value)
